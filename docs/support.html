@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Support · commit-live light</title><link rel="icon" href="assets/logo.png"><link rel="stylesheet" href="style.css"></head>
+<body><header><img src="assets/logo.png" alt=""><div><h1>Support</h1><div>commit-live light</div></div></header>
+<ul>
+<li><b>Bugs and questions:</b> <a href="https://github.com/fitzyracing1/commit-live/issues">open a GitHub issue</a>. Please include the repository,
+the commit sha, and a link to the <code>commit-live</code> check or workflow run.</li>
+<li><b>Private or account questions:</b> <a href="mailto:Fitzyracing1@gmail.com">Fitzyracing1@gmail.com</a></li>
+<li><b>Is the App up?</b> <a href="https://commit-live-app-production.up.railway.app/healthz">/healthz</a> returns
+<code>"ok": true, "configured": true</code> when it is.</li>
+<li><b>How it works:</b> <a href="https://github.com/fitzyracing1/commit-live/blob/main/SPEC.md">SPEC.md</a>. The App server is in
+<code>app/</code> (pull request <a href="https://github.com/fitzyracing1/commit-live/pull/1">#1</a>).</li>
+</ul>
+<h2>Common answers</h2>
+<ul>
+<li><b>The check says "waiting":</b> the light is set when every push and pull request workflow run on the commit has finished.</li>
+<li><b>"No workflow run yet, so no light":</b> the commit has no push or pull request workflow run. No data is not a light.</li>
+<li><b>Go live was refused:</b> only a lit commit with a preview at <code>c/&lt;sha&gt;/</code> on <code>gh-pages</code> can go live, and only
+someone with write access can do it. The check's summary says which of these failed.</li>
+</ul>
+<footer><a href="./">commit-live</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="support.html">Support</a> · <a href="https://github.com/fitzyracing1/commit-live">Source</a></footer></body></html>

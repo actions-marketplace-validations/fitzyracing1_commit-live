@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>commit-live light</title><link rel="icon" href="assets/logo.png"><link rel="stylesheet" href="style.css"></head>
+<body><header><img src="assets/logo.png" alt=""><div><h1>commit-live light</h1><div>commit-live light</div></div></header>
+<p>Live on a commit. Every commit gets a <b>lit</b> or <b>dark</b> light from its own workflow runs. A lit commit can go
+live with one click: the GitHub Pages root then serves that commit's preview build. Nothing is merged.</p>
+<ul>
+<li><b>GitHub App</b> (commit-live light): writes its own <code>commit-live</code> check on each push and pull request.
+The check is lit only when every push or pull request workflow run on the commit is lit, and only a lit check shows <b>Go live</b>.</li>
+<li><b>GitHub Action</b> (<code>uses: fitzyracing1/commit-live@v1</code>): runs your tests, posts the light, and deploys a preview
+at <code>/c/&lt;sha&gt;/</code> on your <code>gh-pages</code> branch.</li>
+</ul>
+<p><a href="https://github.com/apps/commit-live-light">Install the App</a> ·
+<a href="https://github.com/fitzyracing1/commit-live#quickstart">Action quickstart</a> ·
+<a href="https://github.com/fitzyracing1/commit-live/blob/main/SPEC.md">The standard (SPEC.md)</a> ·
+<a href="https://commit-live-app-production.up.railway.app/healthz">Status</a> ·
+<a href="https://github.com/fitzyracing1/commit-live-demo">Demo</a></p>
+<p>Free. MIT licensed. Run by Joshua Almeida.</p>
+<footer><a href="./">commit-live</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="support.html">Support</a> · <a href="https://github.com/fitzyracing1/commit-live">Source</a></footer></body></html>
