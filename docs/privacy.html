@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Privacy policy · commit-live light</title><link rel="icon" href="assets/logo.png"><link rel="stylesheet" href="style.css"></head>
+<body><header><img src="assets/logo.png" alt=""><div><h1>Privacy policy</h1><div>commit-live light</div></div></header>
+<p>Last updated October 15, 2026. This covers the <b>commit-live light</b> GitHub App (App ID 5337969) and its webhook
+server at <code>commit-live-app-production.up.railway.app</code>, run by Joshua Almeida. The commit-live GitHub Action runs
+in your own GitHub Actions and sends nothing to us.</p>
+
+<h2>What the App reads</h2>
+<p>Only repositories you install it on, using the permissions you approve:</p>
+<ul>
+<li>webhook events GitHub sends for those repositories: push, pull request, workflow run and check run;</li>
+<li>the workflow runs on a commit (names, events, status and conclusion), to decide whether the commit is lit or dark;</li>
+<li>its own <code>commit-live</code> check runs;</li>
+<li>when someone clicks <b>Go live</b>: that person's permission level on the repository and the repository's Pages settings.</li>
+</ul>
+<p>It does not read your source code. Go-live fetches only the <code>gh-pages</code> branch.</p>
+
+<h2>What the App writes</h2>
+<ul>
+<li><code>commit-live</code> check runs on your commits (lit or dark, with a short summary);</li>
+<li>on <b>Go live</b>: a commit to your <code>gh-pages</code> branch that copies <code>c/&lt;sha&gt;/</code> to the root, plus a
+<code>live.json</code> file in that branch with the commit sha, a link to the check, the time, and the GitHub username of
+the person who clicked. That file is in your repository and is public if the repository is public.</li>
+</ul>
+
+<h2>What we store</h2>
+<ul>
+<li><b>No database, no files.</b> The server keeps only, in memory: the IDs of recent webhook deliveries (to drop duplicates), and
+short-lived installation tokens from GitHub (about one hour). Both are lost on every restart.</li>
+<li><b>Server logs.</b> Each event writes one log line with the repository name, short commit sha, event type, delivery
+ID and result (lit, dark, waiting, live or refused). Refusals can include the GitHub username of the person who clicked. Logs are
+kept by our host, <a href="https://railway.com/legal/privacy">Railway</a>, under its retention policy for the
+plan in use. We don't export, sell or share them, and we don't use them for anything but running and debugging the App.</li>
+<li>No cookies, analytics, tracking or advertising. We never ask for personal data beyond what GitHub includes in webhooks.</li>
+</ul>
+
+<h2>Who else sees data</h2>
+<p>GitHub, which sends the webhooks and hosts your repository and Pages site, and Railway, which hosts the server. No one else.</p>
+
+<h2>Removing data</h2>
+<p>Uninstall the App from your account or organization settings, and it gets no more events or access. Check runs and
+<code>gh-pages</code> commits it made are in your repository, and you can delete them there. To ask about log lines for
+your repositories, email us.</p>
+
+<h2>Contact</h2>
+<p><a href="mailto:Fitzyracing1@gmail.com">Fitzyracing1@gmail.com</a> ·
+<a href="https://github.com/fitzyracing1/commit-live/issues">GitHub issues</a></p>
+<p>If this policy changes, the new version is published here with a new date, and the history is in
+<a href="https://github.com/fitzyracing1/commit-live/commits/main/docs/privacy.html">the repository</a>.</p>
+<footer><a href="./">commit-live</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="support.html">Support</a> · <a href="https://github.com/fitzyracing1/commit-live">Source</a></footer></body></html>
