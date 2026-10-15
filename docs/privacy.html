@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Privacy policy · commit-live light</title><link rel="icon" href="assets/logo.png"><link rel="stylesheet" href="style.css"></head>
 <body><header><img src="assets/logo.png" alt=""><div><h1>Privacy policy</h1><div>commit-live light</div></div></header>
-<p>Last updated October 15, 2026. This covers the <b>commit-live light</b> GitHub App (App ID 5337969) and its webhook
+<p>Last updated October 15, 2026 (permissions and Marketplace plan events added). This covers the <b>commit-live light</b> GitHub App (App ID 5337969) and its webhook
 server at <code>commit-live-app-production.up.railway.app</code>, run by Joshua Almeida. The commit-live GitHub Action runs
 in your own GitHub Actions and sends nothing to us.</p>
 
@@ -14,6 +14,10 @@ in your own GitHub Actions and sends nothing to us.</p>
 <li>when someone clicks <b>Go live</b>: that person's permission level on the repository and the repository's Pages settings.</li>
 </ul>
 <p>It does not read your source code. Go-live fetches only the <code>gh-pages</code> branch.</p>
+<p>The permissions it asks for are exactly: Checks read &amp; write, Contents read &amp; write, Actions read, Pull requests
+read (only so GitHub sends pull request events), Pages read and Metadata read.</p>
+<p>If you get the App through GitHub Marketplace, GitHub also sends a plan event (purchased, changed or cancelled) with your
+account name, account ID and plan. The App's one plan is free; that event is written to the server log once and nothing else.</p>
 
 <h2>What the App writes</h2>
 <ul>
@@ -28,7 +32,7 @@ the person who clicked. That file is in your repository and is public if the rep
 <li><b>No database, no files.</b> The server keeps only, in memory: the IDs of recent webhook deliveries (to drop duplicates), and
 short-lived installation tokens from GitHub (about one hour). Both are lost on every restart.</li>
 <li><b>Server logs.</b> Each event writes one log line with the repository name, short commit sha, event type, delivery
-ID and result (lit, dark, waiting, live or refused). Refusals can include the GitHub username of the person who clicked. Logs are
+ID and result (lit, dark, waiting, live or refused). Refusals can include the GitHub username of the person who clicked, and Marketplace plan events log the account name, ID and plan. Logs are
 kept by our host, <a href="https://railway.com/legal/privacy">Railway</a>, under its retention policy for the
 plan in use. We don't export, sell or share them, and we don't use them for anything but running and debugging the App.</li>
 <li>No cookies, analytics, tracking or advertising. We never ask for personal data beyond what GitHub includes in webhooks.</li>

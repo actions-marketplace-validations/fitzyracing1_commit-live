@@ -35,6 +35,9 @@ inputs:
   fail-on-dark:
     description: Make the job dark when the light is dark.
     default: 'true'
+  app-id:
+    description: go-live only. Trust only the commit-live GitHub App's check run (this app id) instead of the commit status.
+    default: ''
   token:
     description: Token for statuses, comments and the Pages branch.
     default: ${{ github.token }}
@@ -76,5 +79,6 @@ runs:
         INPUT_PAGES_URL: ${{ inputs.pages-url }}
         INPUT_COMMENT: ${{ inputs.comment }}
         INPUT_FAIL_ON_DARK: ${{ inputs.fail-on-dark }}
+        INPUT_APP_ID: ${{ inputs.app-id }}
         INPUT_TOKEN: ${{ inputs.token }}
       run: node "$GITHUB_ACTION_PATH/src/cli.mjs"

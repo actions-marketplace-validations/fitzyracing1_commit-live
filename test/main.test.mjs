@@ -216,3 +216,22 @@ test('go-live needs a sha', async () => {
     /must be a commit sha/,
   );
 });
+
+test('go-live with app-id trusts the App check, not commit statuses', async () => {
+  const gh = fakeGh({ statuses: status('success') });
+  gh.get = async (p) =>
+    p.includes('/check-runs?')
+      ? { check_runs: [{ name: 'commit-live', app: { id: 1 }, status: 'completed', conclusion: 'success' }] }
+      : [];
+  let went = 0;
+  const code = await goLiveMode({
+    inputs: inputs({ mode: 'go-live', sha: A, appId: '5337969' }),
+    ctx: ctx(),
+    gh,
+    env: {},
+    log: quiet,
+    live: async () => went++,
+  });
+  assert.equal(code, 1, 'a check from another app is no light');
+  assert.equal(went, 0);
+});

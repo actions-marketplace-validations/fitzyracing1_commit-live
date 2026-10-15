@@ -2,7 +2,7 @@
 import { appendFileSync, readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { createGitHub, LightError, toBit, lamp } from '@fitzyracing1/light-core';
-import { runTests, statusFor, lightFromStatuses, CONTEXT } from './light.mjs';
+import { runTests, statusFor, lightFromStatuses, lightFromAppCheck, CONTEXT } from './light.mjs';
 import { commentBody, upsertComment } from './comment.mjs';
 import { publishPreview, goLive, checkSha } from './pages.mjs';
 
@@ -22,6 +22,7 @@ export function readInputs(env = process.env) {
     pagesUrl: input('pages-url'),
     comment: input('comment', 'true') === 'true',
     failOnDark: input('fail-on-dark', 'true') === 'true',
+    appId: input('app-id'),
     token: input('token') || env.GITHUB_TOKEN || '',
   };
 }
@@ -146,10 +147,17 @@ export async function resolveSha(gh, repo, sha) {
 
 export async function goLiveMode({ inputs, ctx, gh, env = process.env, log = console.log, live = goLive }) {
   const sha = checkSha(await resolveSha(gh, ctx.repo, inputs.sha));
-  const statuses = await gh.get(`/repos/${ctx.repo}/commits/${sha}/statuses?per_page=100`);
   let light;
   try {
-    ({ light } = lightFromStatuses(statuses));
+    if (inputs.appId) {
+      // trust only the commit-live GitHub App's own check run (SPEC.md section 7)
+      const q = `check_name=${CONTEXT}&app_id=${inputs.appId}&filter=latest`;
+      const { check_runs: runs = [] } = await gh.get(`/repos/${ctx.repo}/commits/${sha}/check-runs?${q}`);
+      ({ light } = lightFromAppCheck(runs, inputs.appId));
+    } else {
+      const statuses = await gh.get(`/repos/${ctx.repo}/commits/${sha}/statuses?per_page=100`);
+      ({ light } = lightFromStatuses(statuses));
+    }
   } catch (e) {
     if (!(e instanceof LightError)) throw e;
     log(`::error::commit-live refused go-live for ${sha}: ${e.message}`);

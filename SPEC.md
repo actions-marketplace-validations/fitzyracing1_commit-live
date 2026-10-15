@@ -75,15 +75,19 @@ Concurrent jobs: each update is a fresh checkout + commit + push; a rejected pus
 - Anyone who can write commit statuses can write a `commit-live` status. Go-live trusts the repository's own
   write access; it doesn't rerun the tests. The GitHub App (section 7) closes this gap.
 
-## 7. Plan: the commit-live GitHub App (not built)
+## 7. The commit-live GitHub App
 
-Needs Joshua to register a GitHub App; nothing below exists yet.
+The App is registered as **commit-live light** (App ID 5337969). Its server is in [app/](app/README.md). It needs the
+App's private key and webhook secret to be configured; until then it answers `/healthz` as not configured.
 
 - **Why:** one-click install with no workflow file, checks instead of statuses, a "Go live" button on the check,
   and a light only the app can write.
-- **Permissions:** Checks (write), Commit statuses (read), Contents (write, Pages branch only), Pull requests
-  (write, comments), Pages (write), Metadata (read). **Events:** `push`, `pull_request`, `check_run`
-  (`requested_action`), `workflow_run`.
+- **Permissions:** Checks (read & write: the `commit-live` check), Contents (read & write: go-live pushes the `gh-pages` branch;
+  also needed for `push` events), Actions (read: workflow runs and `workflow_run` events), Pull requests (read: only so
+  GitHub sends `pull_request` events; no pull request API is called), Pages (read: the site URL), Metadata (read:
+  the clicker's permission level). No Commit statuses, no write to pull requests, issues or Pages.
+  **Events:** `push`, `pull_request`, `check_run` (`requested_action`), `workflow_run`; Marketplace plan events
+  (`marketplace_purchase`) are logged and answered 200 (one free plan, nothing gated).
 - **Flow:**
   1. On `workflow_run` completed for a workflow named in `.github/commit-live.yml`, the app reads that run's
      conclusion with light-core `lightOfRun()` (only `success` is lit) and writes a check run named `commit-live`
@@ -93,7 +97,7 @@ Needs Joshua to register a GitHub App; nothing below exists yet.
   3. Previews keep the same `c/<sha>/` layout so the Action and the App are interchangeable.
 - **Trust:** go-live reads the app's own check run (`app.id` must match), so a status written by anyone else
   can't make a commit live.
-- **Hosting:** a small webhook service. It would be a new deploy, so it waits for approval; until then the Action
-  is the whole product.
-- **Steps for Joshua:** register the app (name, webhook URL, the permissions above), generate a private key,
-  approve a host, and install it on a test repo.
+- **Hosting:** a small webhook service (`app/`, Railway project `commit-live-app`).
+- **Action:** go-live with `app-id: 5337969` trusts only the App's check run, not commit statuses.
+- **Steps for Joshua:** generate a private key and a webhook secret in the App settings, put both on the host, set
+  the webhook URL, and install the App on a test repo.

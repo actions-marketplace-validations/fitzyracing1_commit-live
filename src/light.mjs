@@ -40,4 +40,15 @@ export function lightFromStatuses(statuses, context = CONTEXT) {
   return { light: lightOf(s.state === 'success' ? 'success' : 'failure'), status: s };
 }
 
+// The light from the commit-live App's check run: only a completed check by that app id counts.
+export function lightFromAppCheck(checkRuns, appId, name = CONTEXT) {
+  const mine = (checkRuns ?? []).filter((c) => c.name === name && String(c.app?.id) === String(appId));
+  if (!mine.length)
+    throw new LightError('no-run', `no ${name} check from app ${appId} on this commit, so it has no light`);
+  const c = mine[0];
+  if (c.status !== 'completed')
+    throw new LightError('not-completed', `the ${name} check is ${c.status}, so there is no light yet`);
+  return { light: lightOf(c.conclusion), check: c };
+}
+
 export { toBit, lamp };
