@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { createGitHub } from '@fitzyracing1/light-core';
 import { verifySignature, normalizeKey, installationTokens } from './auth.mjs';
 import { createHandlers } from './handlers.mjs';
+import { marketplaceEvent, marketplaceLogLine } from './marketplace.mjs';
 
 export function readConfig(env = process.env) {
   const cfg = {
@@ -81,6 +82,12 @@ export function createApp({ config = readConfig(), handlers, log = console.log }
         return send(res, 400, { error: 'body must be JSON' });
       }
       if (event === 'ping') return send(res, 200, { pong: true, zen: payload.zen ?? null });
+      if (event === 'marketplace_purchase') {
+        // free plan only: nothing to grant or revoke, so log it and say 200
+        const m = marketplaceEvent(payload);
+        log(`${delivery}: ${marketplaceLogLine(m)}`);
+        return send(res, 200, { received: 'marketplace_purchase', action: m.action, account: m.account, plan: m.plan });
+      }
       // answer within GitHub's 10 s; do the work after
       send(res, 202, { accepted: event, delivery });
       h.handle(event, payload).then(

@@ -5,6 +5,9 @@ every push / pull_request commit. That check is the trusted light. A **Go live**
 See [SPEC.md](../SPEC.md) section 7.
 
 - `POST /webhook`: GitHub webhooks, verified with `X-Hub-Signature-256`
+- Marketplace `marketplace_purchase` events (purchased, changed, cancelled, pending_change,
+  pending_change_cancelled): signature-checked, one log line (account, plan, action), answered 200. Free plan only, so
+  nothing is gated.
 - `GET /healthz`: `{ ok, configured, appId, missing }`. It stays healthy while not configured, and webhooks get 503.
 
 ## Environment
@@ -19,8 +22,18 @@ See [SPEC.md](../SPEC.md) section 7.
 ## App settings
 
 - **Webhook URL:** `https://<host>/webhook`, content type `application/json`
-- **Repository permissions:** Checks read & write, Contents read & write (go-live pushes the Pages branch),
-  Actions read, Pages read, Metadata read
+- **Repository permissions (the full set, nothing else):**
+
+  | permission | access | why |
+  |---|---|---|
+  | Checks | read & write | create and update the `commit-live` check |
+  | Contents | read & write | go-live pushes the `gh-pages` branch; `push` events |
+  | Actions | read | workflow runs on a commit; `workflow_run` events |
+  | Pull requests | read | only so GitHub sends `pull_request` events (no pull request API call) |
+  | Pages | read | the Pages site URL for the check summary |
+  | Metadata | read | the clicker's permission level (always granted) |
+
+  Not needed: Commit statuses, Pull requests write, Issues, Pages write.
 - **Subscribe to events:** Push, Pull request, Workflow run, Check run
 
 ## How a light is set

@@ -206,3 +206,46 @@ test('server configured: signature checked, ping answered, events accepted and h
     s.close();
   }
 });
+
+test('marketplace_purchase: every action is verified, logged with account and plan, and answered 200', async () => {
+  const { MARKETPLACE_ACTIONS } = await import('../app/marketplace.mjs');
+  const logs = [];
+  const handled = [];
+  const config = { configured: true, missing: [], appId: String(APP), webhookSecret: 'shh', privateKey: 'x' };
+  const s = await serve(
+    createApp({ config, handlers: { handle: async (e) => handled.push(e) }, log: (l) => logs.push(l) }),
+  );
+  const purchase = (action) =>
+    JSON.stringify({
+      action,
+      effective_date: '2026-10-16T00:00:00Z',
+      marketplace_purchase: {
+        account: { login: 'octo-org', id: 42, type: 'Organization' },
+        plan: { id: 7, name: 'Free', price_model: 'FREE' },
+      },
+      ...(action === 'changed' ? { previous_marketplace_purchase: { plan: { name: 'Old' } } } : {}),
+    });
+  const post = (body, sig = sign('shh', body), delivery = String(Math.random())) =>
+    fetch(`${s.url}/webhook`, {
+      method: 'POST',
+      body,
+      headers: { 'x-github-event': 'marketplace_purchase', 'x-hub-signature-256': sig, 'x-github-delivery': delivery },
+    });
+  try {
+    for (const action of MARKETPLACE_ACTIONS) {
+      const r = await post(purchase(action));
+      assert.equal(r.status, 200, action);
+      assert.deepEqual(await r.json(), { received: 'marketplace_purchase', action, account: 'octo-org', plan: 'Free' });
+    }
+    assert.equal((await post(purchase('purchased'), 'sha256=forged')).status, 401);
+    assert.equal(logs.length, MARKETPLACE_ACTIONS.length);
+    assert.match(
+      logs[0],
+      /marketplace_purchase\.purchased: Organization octo-org \(42\) plan Free \(7, FREE\) effective 2026-10-16/,
+    );
+    assert.match(logs[1], /\.changed: .*\(was Old\)/);
+    assert.deepEqual(handled, [], 'plan events never reach the check handlers');
+  } finally {
+    s.close();
+  }
+});

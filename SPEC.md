@@ -82,9 +82,12 @@ App's private key and webhook secret to be configured; until then it answers `/h
 
 - **Why:** one-click install with no workflow file, checks instead of statuses, a "Go live" button on the check,
   and a light only the app can write.
-- **Permissions:** Checks (write), Commit statuses (read), Contents (write, Pages branch only), Pull requests
-  (write, comments), Pages (write), Metadata (read). **Events:** `push`, `pull_request`, `check_run`
-  (`requested_action`), `workflow_run`.
+- **Permissions:** Checks (read & write: the `commit-live` check), Contents (read & write: go-live pushes the `gh-pages` branch;
+  also needed for `push` events), Actions (read: workflow runs and `workflow_run` events), Pull requests (read: only so
+  GitHub sends `pull_request` events; no pull request API is called), Pages (read: the site URL), Metadata (read:
+  the clicker's permission level). No Commit statuses, no write to pull requests, issues or Pages.
+  **Events:** `push`, `pull_request`, `check_run` (`requested_action`), `workflow_run`; Marketplace plan events
+  (`marketplace_purchase`) are logged and answered 200 (one free plan, nothing gated).
 - **Flow:**
   1. On `workflow_run` completed for a workflow named in `.github/commit-live.yml`, the app reads that run's
      conclusion with light-core `lightOfRun()` (only `success` is lit) and writes a check run named `commit-live`
