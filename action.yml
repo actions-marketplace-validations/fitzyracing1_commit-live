@@ -1,5 +1,5 @@
-name: commit-live
-description: Live on a commit. Every commit gets a lit/dark light and, when lit, a Pages preview; go-live points the site at a lit commit. No external service.
+name: commit-live light
+description: A lit/dark light and preview per commit; go live only on a lit commit. Runs entirely on GitHub.
 author: Joshua Almeida
 branding:
   icon: zap
