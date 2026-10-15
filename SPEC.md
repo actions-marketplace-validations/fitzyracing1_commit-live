@@ -75,9 +75,10 @@ Concurrent jobs: each update is a fresh checkout + commit + push; a rejected pus
 - Anyone who can write commit statuses can write a `commit-live` status. Go-live trusts the repository's own
   write access; it doesn't rerun the tests. The GitHub App (section 7) closes this gap.
 
-## 7. Plan: the commit-live GitHub App (not built)
+## 7. The commit-live GitHub App
 
-Needs Joshua to register a GitHub App; nothing below exists yet.
+The App is registered as **commit-live light** (App ID 5337969). Its server is in [app/](app/README.md). It needs the
+App's private key and webhook secret to be configured; until then it answers `/healthz` as not configured.
 
 - **Why:** one-click install with no workflow file, checks instead of statuses, a "Go live" button on the check,
   and a light only the app can write.
@@ -93,7 +94,7 @@ Needs Joshua to register a GitHub App; nothing below exists yet.
   3. Previews keep the same `c/<sha>/` layout so the Action and the App are interchangeable.
 - **Trust:** go-live reads the app's own check run (`app.id` must match), so a status written by anyone else
   can't make a commit live.
-- **Hosting:** a small webhook service. It would be a new deploy, so it waits for approval; until then the Action
-  is the whole product.
-- **Steps for Joshua:** register the app (name, webhook URL, the permissions above), generate a private key,
-  approve a host, and install it on a test repo.
+- **Hosting:** a small webhook service (`app/`, Railway project `commit-live-app`).
+- **Action:** go-live with `app-id: 5337969` trusts only the App's check run, not commit statuses.
+- **Steps for Joshua:** generate a private key and a webhook secret in the App settings, put both on the host, set
+  the webhook URL, and install the App on a test repo.

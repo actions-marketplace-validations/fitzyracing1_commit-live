@@ -57,3 +57,23 @@ test('no commit-live status, or a pending one, is no light (an error, never dark
     (e) => e.code === 'not-completed',
   );
 });
+
+test('app check: only the app’s own completed check counts', async () => {
+  const { lightFromAppCheck } = await import('../src/light.mjs');
+  const c = (conclusion, id = 5337969, status = 'completed') => ({
+    name: 'commit-live',
+    app: { id },
+    status,
+    conclusion,
+  });
+  assert.equal(lightFromAppCheck([c('success')], '5337969').light, 'lit');
+  assert.equal(lightFromAppCheck([c('failure')], '5337969').light, 'dark');
+  assert.throws(
+    () => lightFromAppCheck([c('success', 1)], '5337969'),
+    (e) => e.code === 'no-run',
+  );
+  assert.throws(
+    () => lightFromAppCheck([c(null, 5337969, 'in_progress')], '5337969'),
+    (e) => e.code === 'not-completed',
+  );
+});
