@@ -1,0 +1,80 @@
+name: commit-live
+description: Live on a commit. Every commit gets a lit/dark light and, when lit, a Pages preview; go-live points the site at a lit commit. No external service.
+author: Joshua Almeida
+branding:
+  icon: zap
+  color: yellow
+inputs:
+  mode:
+    description: 'check (push / pull_request: test, light, preview) or go-live (point the Pages root at a lit commit).'
+    default: check
+  test-command:
+    description: Shell command whose exit code is the light. 0 is lit, anything else is dark.
+    default: npm test
+  build-command:
+    description: Optional shell command that builds the static site, run only when a preview will be deployed.
+    default: ''
+  build-dir:
+    description: Directory with the static build to preview under /c/<sha>/. Leave empty for no previews.
+    default: ''
+  preview:
+    description: 'lit (default: only lit commits get a preview), always, or never.'
+    default: lit
+  sha:
+    description: go-live only. The commit to make live (full or abbreviated sha). It must be lit.
+    default: ''
+  pages-branch:
+    description: Branch GitHub Pages serves from.
+    default: gh-pages
+  pages-url:
+    description: Base URL of the Pages site. Defaults to https://<owner>.github.io/<repo>/.
+    default: ''
+  comment:
+    description: Post or update one PR comment with the light (pull_request events).
+    default: 'true'
+  fail-on-dark:
+    description: Make the job dark when the light is dark.
+    default: 'true'
+  token:
+    description: Token for statuses, comments and the Pages branch.
+    default: ${{ github.token }}
+outputs:
+  light:
+    description: lit or dark (empty when go-live was refused for having no light)
+    value: ${{ steps.run.outputs.light }}
+  bit:
+    description: 0 for lit, 1 for dark
+    value: ${{ steps.run.outputs.bit }}
+  sha:
+    description: The commit the light belongs to
+    value: ${{ steps.run.outputs.sha }}
+  preview-url:
+    description: URL of this commit's preview, when one was deployed
+    value: ${{ steps.run.outputs.preview-url }}
+  live-url:
+    description: go-live only. The Pages root that now serves the commit
+    value: ${{ steps.run.outputs.live-url }}
+runs:
+  using: composite
+  steps:
+    - name: Install commit-live
+      shell: bash
+      run: |
+        node -e "if (+process.versions.node.split('.')[0] < 18) { console.error('commit-live needs Node 18+ on the runner'); process.exit(1) }"
+        npm ci --omit=dev --no-audit --no-fund --prefix "$GITHUB_ACTION_PATH" > /dev/null
+    - name: commit-live
+      id: run
+      shell: bash
+      env:
+        INPUT_MODE: ${{ inputs.mode }}
+        INPUT_TEST_COMMAND: ${{ inputs.test-command }}
+        INPUT_BUILD_COMMAND: ${{ inputs.build-command }}
+        INPUT_BUILD_DIR: ${{ inputs.build-dir }}
+        INPUT_PREVIEW: ${{ inputs.preview }}
+        INPUT_SHA: ${{ inputs.sha }}
+        INPUT_PAGES_BRANCH: ${{ inputs.pages-branch }}
+        INPUT_PAGES_URL: ${{ inputs.pages-url }}
+        INPUT_COMMENT: ${{ inputs.comment }}
+        INPUT_FAIL_ON_DARK: ${{ inputs.fail-on-dark }}
+        INPUT_TOKEN: ${{ inputs.token }}
+      run: node "$GITHUB_ACTION_PATH/src/cli.mjs"
